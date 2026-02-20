@@ -2,39 +2,41 @@ import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-class TestFormulario(unittest.TestCase):
+class TestRegistro(unittest.TestCase):
+
     def setUp(self):
+        # Configuración inicial: Abrir el navegador
         self.driver = webdriver.Chrome()
-        self.driver.get("https://www.saucedemo.com/")
-        # Login rápido para llegar al formulario
-        self.driver.find_element(By.ID, "user-name").send_keys("standard_user")
-        self.driver.find_element(By.ID, "password").send_keys("secret_sauce")
-        self.driver.find_element(By.ID, "login-button").click()
-        # Ir a la zona de pago
-        self.driver.get("https://www.saucedemo.com/checkout-step-one.html")
+        self.driver.get("https://the-internet.herokuapp.com/login") # Usamos una página de prueba real
 
-    def test_errores_formulario(self):
+    def test_campos_vacios(self):
         driver = self.driver
-        # DATOS DINÁMICOS: (Nombre, Apellido, Zip, Error esperado)
-        casos = [
-            ("", "Perez", "12345", "Error: First Name is required"),
-            ("Karla", "", "12345", "Error: Last Name is required"),
-            ("Karla", "Civil", "", "Error: Postal Code is required")
-        ]
+        # 1. Localizar el botón de submit y darle clic sin llenar nada
+        boton_login = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
+        boton_login.click()
 
-        for nom, ape, zip_code, error_esperado in casos:
-            driver.refresh() # Limpiar todo
-            driver.find_element(By.ID, "first-name").send_keys(nom)
-            driver.find_element(By.ID, "last-name").send_keys(ape)
-            driver.find_element(By.ID, "postal-code").send_keys(zip_code)
-            driver.find_element(By.ID, "continue").click()
+        # 2. Capturar el mensaje de error que aparece en la página
+        mensaje_error = driver.find_element(By.ID, "flash").text
 
-            # Validar mensaje
-            error_web = driver.find_element(By.CSS_SELECTOR, "h3[data-test='error']").text
-            self.assertEqual(error_web, error_esperado)
-            print(f"✅ Validación '{error_esperado}': PASADA")
+        # 3. EL ASSERT: Verificamos que el mensaje contenga la palabra 'invalid'
+        # Si el mensaje no contiene eso, la prueba fallará automáticamente
+        self.assertIn("invalid", mensaje_error)
+
+    def test_registro_exitoso(self):
+        driver = self.driver
+        
+        # Llenar datos válidos (Usando credenciales de esa página de prueba)
+        driver.find_element(By.NAME, "username").send_keys("tomsmith")
+        driver.find_element(By.NAME, "password").send_keys("SuperSecretPassword!")
+        
+        driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+
+        # Validar que entramos a la zona segura
+        mensaje_exito = driver.find_element(By.ID, "flash").text
+        self.assertIn("You logged into a secure area!", mensaje_exito)
 
     def tearDown(self):
+        # Cerrar el navegador al terminar cada prueba
         self.driver.quit()
 
 if __name__ == "__main__":
