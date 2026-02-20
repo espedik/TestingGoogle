@@ -1,0 +1,33 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys # Para presionar Enter
+import time
+
+# 1. Configurar el Driver (Usando el modo 'detach' para que no se cierre)
+options = webdriver.ChromeOptions()
+options.add_experimental_option("detach", True)
+driver = webdriver.Chrome(options=options)
+
+# 2. Ir a Amazon (usaremos la de México por cercanía, pero funciona igual en .com)
+driver.get("https://www.amazon.com.mx")
+
+try:
+    # 3. Localizar la barra de búsqueda
+    # El ID de la barra en Amazon suele ser "twotabsearchtextbox"
+    barra_busqueda = driver.find_element(By.ID, "twotabsearchtextbox")
+    
+    # 4. Escribir lo que queremos buscar
+    producto = "LEGO Star Wars"
+    barra_busqueda.send_keys(producto)
+    
+    # 5. Opción A: Presionar la tecla Enter
+    barra_busqueda.send_keys(Keys.ENTER)
+    
+    # Opción B (por si prefieres el clic):
+    # boton_buscar = driver.find_element(By.ID, "nav-search-submit-button")
+    # boton_buscar.click()
+
+    print(f"Búsqueda de '{producto}' realizada con éxito.")
+
+except Exception as e:
+    print(f"Ocurrió un error: {e}")
