@@ -1,9 +1,9 @@
-#Creating new document for python scripts
-
-import unittest
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 
-# Esto descarga el driver automáticamente y abre el navegador
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+driver = webdriver.Chrome()
+driver.get("https://www.google.com")
+
+# El código se detendrá aquí y el navegador se quedará abierto
+input("Presiona Enter en la terminal para cerrar el navegador...")
+
+driver.quit()
